@@ -957,56 +957,57 @@ function formatMsg(text) {
 const saved = sessionStorage.getItem('chatHistory');
 if (saved) conversationHistory = JSON.parse(saved);
 
+function getSimulatedReply(userText) {
+  const text = userText.toLowerCase();
+
+  if ((text.includes('register') && text.includes('exam')) || text.includes('exam registration')) {
+    return `To register for exams in TUMonline:\n\n1. Log in and go to **Exams → Registration**\n2. Search for your course by name or number\n3. Select the exam and click **Register**\n4. Confirm — you'll receive an email\n\nRegistration windows open ~4–6 weeks before the exam period. The Prüfungsamt sets exact deadlines each semester.\n\nWould you like to know how to deregister if your plans change?`;
+  }
+  if (text.includes('deregister') || (text.includes('withdraw') && text.includes('exam'))) {
+    return `You can deregister from an exam in TUMonline up to **3 days before** the exam — no reason needed.\n\n1. Go to **Exams → Deregistration**\n2. Select the exam and confirm\n\nAfter that deadline, you need a medical certificate (Attest) to withdraw without a failed attempt being recorded. Contact the Prüfungsamt directly in urgent cases.\n\nIs there a specific exam you need to deregister from?`;
+  }
+  if (text.includes('credit') || text.includes('transfer') || text.includes('anerkennung')) {
+    return `For a credit transfer (Anerkennungsantrag) at TUM:\n\n1. Download the **Anerkennungsantrag** form from your department's website\n2. Attach your original transcript and course syllabus\n3. Submit to your **Prüfungsamt** — in person or by email\n4. The responsible examiner reviews the module equivalence\n\nProcessing typically takes 4–8 weeks. Check the status in TUMonline under **Credits → Transfer Requests**.\n\nDo you know which module you're trying to get credited?`;
+  }
+  if (text.includes('missed') || (text.includes('miss') && text.includes('deadline'))) {
+    return `It depends on the type of deadline:\n\n- **Exam registration**: Contact the Prüfungsamt immediately — exceptions are sometimes granted for first-time cases\n- **Re-enrollment**: There's usually a late fee window of 1–2 weeks\n- **Credit transfer**: These are rolling, so you can usually still submit\n\nAlways reach out to your **Prüfungsamt** as soon as possible — they're often more flexible than students expect.\n\nWhich deadline did you miss?`;
+  }
+  if (text.includes('ects') || text.includes('how many credits') || text.includes('credits needed')) {
+    return `For **Computer Engineering M.Sc.** at TUM you need **120 ECTS** total:\n\n- Core modules: ~60 ECTS\n- Electives: ~42 ECTS\n- Master's thesis + seminar: 30 ECTS\n\nCheck your progress under **My Studies → ECTS Overview** in TUMonline. Your Prüfungsordnung on the department website has the full breakdown.\n\nWould you like help mapping your current modules to these requirements?`;
+  }
+  if (text.includes('thesis') || text.includes('masterarbeit')) {
+    return `To register your Master's thesis at TUM:\n\n1. Find a supervisor (professor or research group)\n2. Confirm **Zulassungsvoraussetzungen** — usually 80–90 ECTS completed\n3. Fill in the **Anmeldung zur Masterarbeit** with your supervisor\n4. Submit to the Prüfungsamt — they set the official start date\n\nYou then have **6 months** to complete it. Extensions require a formal application.\n\nHave you already found a supervisor, or do you need tips on that?`;
+  }
+  if (text.includes('enroll') || text.includes('re-enroll') || text.includes('rückmeld')) {
+    return `Re-enrollment (Rückmeldung) happens each semester:\n\n1. Pay the semester fee (~€150) within the re-enrollment window\n2. TUMonline updates your status within a few days\n3. Download your new **Immatrikulationsbescheinigung** from TUMonline\n\nThe window is usually **Jan–Feb** for summer and **Jul–Aug** for winter semester. Check your TUM email for exact dates.\n\nDo you need help finding the bank transfer details?`;
+  }
+  if (text.includes('leave') || text.includes('urlaubssemester') || text.includes('semester off')) {
+    return `To apply for a leave of absence (Urlaubssemester):\n\n1. Submit an application to the **Studienbüro** before the re-enrollment deadline\n2. Provide a valid reason (internship, illness, personal)\n3. Pay a reduced semester fee\n\nDuring a leave semester you **cannot take exams**, but can continue your thesis. You keep your student status and benefits.\n\nWould you like to know how it affects your standard study period?`;
+  }
+  if (text.includes('in2346') || (text.includes('ai') && text.includes('medicine'))) {
+    return `Your **IN2346 AI in Medicine** credit transfer is currently under review by the Prüfungsamt. Typical processing takes **4–8 weeks** from submission.\n\nCheck the live status in TUMonline under **Credits → Transfer Requests**. If it's been over 8 weeks, send a polite follow-up email to your Prüfungsamt with your Matrikel number.\n\nWould you like help drafting that follow-up email?`;
+  }
+
+  const fallbacks = [
+    `Good question! For the most accurate answer I'd recommend checking **tum.de** or contacting your **Prüfungsamt** directly.\n\nCan you give me a bit more detail about what you're trying to do? I can point you to the right process.`,
+    `I want to give you the right answer — could you tell me a bit more? For example, which semester this relates to or which specific course?\n\nThat'll help me give you more accurate guidance.`,
+    `For this, your first stop should be **TUMonline** and your department's official pages. The **Prüfungsamt** is also very helpful and responds quickly to emails.\n\nIs there a specific step I can help clarify?`
+  ];
+  return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+}
+
 async function callAPI(userText) {
   isLoading = true;
   sendBtn.disabled = true;
   showTyping();
 
-  const program = PROGRAMS[programSelect.value];
-  const systemPrompt = `You are CampusAI, a friendly and knowledgeable AI assistant embedded in TUMonline, the student portal of the Technical University of Munich (TUM).
+  // Simulate realistic response delay
+  await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 800));
 
-The student is enrolled in: ${program}.
-
-Your job is to help students navigate administrative processes confidently. You answer questions about:
-- Exam registration and deregistration (TUMonline deadlines, procedures)
-- Credit recognition and transfer requests (Anerkennungsantrag process)
-- Program changes and module mappings
-- ECTS requirements and course categorisation
-- Enrollment, re-enrollment, and leave of absence
-- Thesis registration
-- General TUM administrative processes
-
-Guidelines:
-- Be concise, warm, and specific — avoid generic answers
-- Reference real TUM processes and terminology (e.g. TUMonline, Prüfungsamt, Anerkennungsantrag)
-- If a deadline or policy might have changed, advise the student to verify on the official TUM website
-- Break complex steps into a short numbered list when helpful
-- Keep answers under 120 words unless the question genuinely requires more detail
-- Never make up specific dates or room numbers
-- End with a short follow-up question or next step to keep things actionable`;
-
-  const messages = conversationHistory.map(m => ({ role: m.role, content: m.content }));
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages
-      })
-    });
-    const data = await res.json();
-    hideTyping();
-    const reply = data.content?.map(b => b.text || '').join('') || 'Sorry, I had trouble answering that. Please try again.';
-    conversationHistory.push({ role: 'assistant', content: reply });
-    addBotMessage(reply);
-  } catch (e) {
-    hideTyping();
-    addBotMessage("I'm having trouble connecting right now. Please try again in a moment.");
-  }
+  hideTyping();
+  const reply = getSimulatedReply(userText);
+  conversationHistory.push({ role: 'assistant', content: reply });
+  addBotMessage(reply);
 
   isLoading = false;
   sendBtn.disabled = false;
