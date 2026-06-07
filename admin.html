@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusAI · Admin Insights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --tum-blue: #003366;
+      --tum-blue-dark: #00244d;
+      --tum-blue-mid: #0a4a8a;
+      --tum-accent: #0077cc;
+      --tum-light: #e8f2fb;
+      --tum-lighter: #f4f8fd;
+      --border: #d8e4f0;
+      --border-light: #eaf1f8;
+      --text-primary: #0d1f35;
+      --text-secondary: #4a6280;
+      --text-tertiary: #8aa0b8;
+      --bg: #f0f5fb;
+      --white: #ffffff;
+      --green: #22c55e;
+      --orange: #f59e0b;
+      --red: #ef4444;
+      --shadow-sm: 0 1px 3px rgba(0,51,102,0.08);
+      --shadow-md: 0 4px 16px rgba(0,51,102,0.12);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* ── TOP NAV (identical to V2) ── */
+    .topnav {
+      background: var(--tum-blue);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      height: 56px;
+      gap: 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+    .logo { font-size: 16px; font-weight: 600; color: white; letter-spacing: 0.3px; display: flex; align-items: center; gap: 10px; }
+    .logo-badge { background: #64aadc; color: var(--tum-blue); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; letter-spacing: 0.5px; }
+    .topnav-links { display: flex; gap: 2px; margin-left: 16px; }
+    .topnav-links a { color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 400; text-decoration: none; padding: 6px 14px; border-radius: var(--radius-sm); transition: all 0.15s; }
+    .topnav-links a:hover { color: white; background: rgba(255,255,255,0.1); }
+    .topnav-links a.active { color: white; background: rgba(255,255,255,0.15); font-weight: 500; }
+    .topnav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .avatar-btn { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #64aadc, #0077cc); color: white; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); }
+    .admin-badge { background: rgba(245,158,11,0.2); color: #fcd34d; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(245,158,11,0.3); }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      max-width: 1100px;
+      margin: 28px auto;
+      gap: 20px;
+      padding: 0 20px;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar { display: flex; flex-direction: column; gap: 6px; }
+    .sidebar-section { background: var(--white); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 8px; box-shadow: var(--shadow-sm); }
+    .sidebar-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.8px; padding: 6px 10px 4px; }
+    .sidebar-link { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--text-secondary); padding: 8px 10px; border-radius: var(--radius-sm); text-decoration: none; cursor: pointer; transition: all 0.15s; font-weight: 400; }
+    .sidebar-link i { font-size: 15px; flex-shrink: 0; }
+    .sidebar-link:hover { background: var(--tum-lighter); color: var(--text-primary); }
+    .sidebar-link.active { background: var(--tum-light); color: var(--tum-blue); font-weight: 500; }
+    .sidebar-link.active i { color: var(--tum-accent); }
+    .sidebar-profile { background: linear-gradient(135deg, #1a3a5c 0%, #0a4a8a 100%); border-radius: var(--radius-lg); padding: 16px; color: white; }
+    .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-bottom: 10px; border: 2px solid rgba(255,255,255,0.3); }
+    .profile-name { font-size: 13px; font-weight: 600; }
+    .profile-prog { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 2px; line-height: 1.4; }
+    .profile-tag { display: inline-block; background: rgba(245,158,11,0.25); color: #fcd34d; font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 20px; margin-top: 8px; border: 1px solid rgba(245,158,11,0.3); }
+
+    /* ── MAIN ── */
+    .main { display: flex; flex-direction: column; gap: 18px; }
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; }
+    .page-title { font-size: 22px; font-weight: 600; color: var(--text-primary); }
+    .page-sub { font-size: 13px; color: var(--text-secondary); margin-top: 3px; }
+    .period-badge { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 6px 14px; font-size: 12px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); }
+    .period-badge i { color: var(--tum-accent); }
+
+    /* ── STATS GRID ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .stat-card { background: var(--white); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 16px 18px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, transform 0.2s; position: relative; overflow: hidden; }
+    .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 0; }
+    .stat-card.blue::before { background: linear-gradient(90deg, var(--tum-accent), #64aadc); }
+    .stat-card.orange::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .stat-card.green::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+    .stat-card.red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .stat-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 15px; margin-bottom: 10px; }
+    .stat-icon.blue { background: var(--tum-light); color: var(--tum-accent); }
+    .stat-icon.orange { background: #fef3c7; color: #d97706; }
+    .stat-icon.green { background: #dcfce7; color: #16a34a; }
+    .stat-icon.red { background: #fee2e2; color: #dc2626; }
+    .stat-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+    .stat-val { font-size: 26px; font-weight: 600; color: var(--tum-blue); margin-top: 2px; line-height: 1; font-family: 'DM Mono', monospace; }
+    .stat-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+    .stat-trend { font-size: 11px; margin-top: 4px; font-weight: 500; display: flex; align-items: center; gap: 3px; }
+    .trend-up { color: #dc2626; }
+    .trend-down { color: #16a34a; }
+
+    /* ── TWO COL ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .three-col { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+
+    /* ── CARD ── */
+    .card { background: var(--white); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow-sm); }
+    .card-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+    .card-title i { color: var(--tum-accent); font-size: 15px; }
+    .card-title-right { margin-left: auto; font-size: 11px; font-weight: 400; color: var(--text-tertiary); }
+
+    /* ── BAR CHART ── */
+    .bar-list { display: flex; flex-direction: column; gap: 10px; }
+    .bar-item { display: flex; flex-direction: column; gap: 4px; }
+    .bar-label-row { display: flex; align-items: center; justify-content: space-between; }
+    .bar-label { font-size: 12px; color: var(--text-secondary); font-weight: 400; }
+    .bar-count { font-size: 12px; font-weight: 600; color: var(--text-primary); font-family: 'DM Mono', monospace; }
+    .bar-track { height: 6px; background: var(--border-light); border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+    .bar-fill.blue { background: linear-gradient(90deg, var(--tum-accent), #64aadc); }
+    .bar-fill.orange { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .bar-fill.red { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+    /* ── TOP QUESTIONS ── */
+    .question-list { display: flex; flex-direction: column; gap: 8px; }
+    .question-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: var(--radius-md); background: var(--tum-lighter); border: 1px solid var(--border-light); transition: background 0.15s; cursor: default; }
+    .question-item:hover { background: var(--tum-light); }
+    .q-rank { font-size: 12px; font-weight: 600; color: var(--text-tertiary); font-family: 'DM Mono', monospace; min-width: 20px; padding-top: 1px; }
+    .q-rank.top { color: var(--tum-accent); }
+    .q-text { font-size: 12px; color: var(--text-primary); flex: 1; line-height: 1.4; }
+    .q-count { font-size: 11px; font-weight: 600; color: var(--text-tertiary); font-family: 'DM Mono', monospace; white-space: nowrap; padding-top: 1px; }
+    .q-tag { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 20px; margin-top: 3px; display: inline-block; }
+    .q-tag.exams { background: var(--tum-light); color: var(--tum-accent); }
+    .q-tag.credits { background: #fef3c7; color: #92400e; }
+    .q-tag.programs { background: #dcfce7; color: #166534; }
+    .q-tag.deadlines { background: #fee2e2; color: #991b1b; }
+
+    /* ── HEATMAP ── */
+    .heatmap-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .heatmap-row { display: flex; align-items: center; gap: 6px; }
+    .heatmap-label { font-size: 11px; color: var(--text-tertiary); width: 80px; flex-shrink: 0; }
+    .heatmap-cells { display: flex; gap: 4px; flex: 1; }
+    .heatmap-cell { flex: 1; height: 24px; border-radius: 4px; }
+    .heat-0 { background: var(--border-light); }
+    .heat-1 { background: #bdd6f0; }
+    .heat-2 { background: #7ab3e0; }
+    .heat-3 { background: #3a8fd1; }
+    .heat-4 { background: #0077cc; }
+    .heat-5 { background: #003366; }
+    .heatmap-months { display: flex; gap: 4px; padding-left: 86px; margin-bottom: 2px; }
+    .heatmap-month { flex: 1; font-size: 10px; color: var(--text-tertiary); text-align: center; }
+
+    /* ── RESOLUTION RATE ── */
+    .resolution-wrap { display: flex; flex-direction: column; gap: 12px; }
+    .resolution-main { display: flex; align-items: center; gap: 16px; }
+    .resolution-circle { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+    .resolution-circle svg { transform: rotate(-90deg); }
+    .resolution-circle-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+    .resolution-pct { font-size: 18px; font-weight: 600; color: var(--tum-blue); font-family: 'DM Mono', monospace; line-height: 1; }
+    .resolution-sub-label { font-size: 10px; color: var(--text-tertiary); }
+    .resolution-details { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+    .res-row { display: flex; align-items: center; justify-content: space-between; }
+    .res-label { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+    .res-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .res-val { font-size: 12px; font-weight: 600; color: var(--text-primary); font-family: 'DM Mono', monospace; }
+
+    /* ── FEEDBACK TABLE ── */
+    .feedback-list { display: flex; flex-direction: column; gap: 6px; }
+    .feedback-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-light); background: var(--tum-lighter); }
+    .fb-icon { font-size: 14px; flex-shrink: 0; }
+    .fb-text { font-size: 12px; color: var(--text-secondary); flex: 1; line-height: 1.4; font-style: italic; }
+    .fb-rating { display: flex; gap: 2px; }
+    .fb-star { font-size: 11px; color: #f59e0b; }
+
+    /* ── NOTICE ── */
+    .notice { background: var(--white); border: 1px solid #bdd6f0; border-left: 4px solid var(--orange); border-radius: var(--radius-md); padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; box-shadow: var(--shadow-sm); }
+    .notice-icon { width: 30px; height: 30px; border-radius: var(--radius-sm); background: #fef3c7; display: flex; align-items: center; justify-content: center; color: #d97706; font-size: 15px; flex-shrink: 0; }
+    .notice-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .notice-text { font-size: 12px; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col, .three-col { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .topnav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="logo">TUMonline <span class="logo-badge">BETA</span></div>
+  <div class="topnav-links">
+    <a href="CampusAI_second_version.html">Student Portal</a>
+    <a href="admin.html" class="active">Admin Insights</a>
+  </div>
+  <div class="topnav-right">
+    <span class="admin-badge"><i class="ti ti-shield" style="font-size:11px;margin-right:3px"></i>Admin View</span>
+    <div class="avatar-btn">SP</div>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-profile">
+      <div class="profile-avatar">SP</div>
+      <div class="profile-name">Studienbüro Portal</div>
+      <div class="profile-prog">TUM School of Management<br>Administrative Staff</div>
+      <span class="profile-tag"><i class="ti ti-shield" style="font-size:10px;margin-right:3px"></i>Admin Access</span>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Insights</div>
+      <a class="sidebar-link active" href="#"><i class="ti ti-chart-bar"></i>Overview</a>
+      <a class="sidebar-link" href="#"><i class="ti ti-message-question"></i>Top Questions</a>
+      <a class="sidebar-link" href="#"><i class="ti ti-map-2"></i>Pain Point Map</a>
+      <a class="sidebar-link" href="#"><i class="ti ti-clock-exclamation"></i>Deadline Misses</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Reports</div>
+      <a class="sidebar-link" href="#"><i class="ti ti-file-analytics"></i>Weekly Report</a>
+      <a class="sidebar-link" href="#"><i class="ti ti-calendar-stats"></i>Semester Summary</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Settings</div>
+      <a class="sidebar-link" href="#"><i class="ti ti-adjustments"></i>Preferences</a>
+      <a class="sidebar-link" href="index.html"><i class="ti ti-arrow-left"></i>Back to Portal</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Admin Insights Dashboard</div>
+        <div class="page-sub">Anonymised data from CampusAI student interactions · All data is aggregated and privacy-safe</div>
+      </div>
+      <div class="period-badge"><i class="ti ti-calendar"></i>Winter 2025/26</div>
+    </div>
+
+    <!-- NOTICE -->
+    <div class="notice">
+      <div class="notice-icon"><i class="ti ti-alert-triangle"></i></div>
+      <div>
+        <div class="notice-title">Spike detected: Exam registration confusion up 34% this week</div>
+        <div class="notice-text">Students are struggling to find the registration button for courses added after week 3. Consider updating the FAQ or adding a tooltip in TUMonline.</div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon blue"><i class="ti ti-messages"></i></div>
+        <div class="stat-label">Total Queries</div>
+        <div class="stat-val">1,284</div>
+        <div class="stat-trend trend-up"><i class="ti ti-trending-up" style="font-size:12px"></i> +18% vs last semester</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon green"><i class="ti ti-circle-check"></i></div>
+        <div class="stat-label">Self-resolved</div>
+        <div class="stat-val">78%</div>
+        <div class="stat-sub">No staff contact needed</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon orange"><i class="ti ti-clock"></i></div>
+        <div class="stat-label">Avg. Resolution</div>
+        <div class="stat-val">42s</div>
+        <div class="stat-trend trend-down"><i class="ti ti-trending-down" style="font-size:12px"></i> vs ~2 weeks by email</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon red"><i class="ti ti-mood-sad"></i></div>
+        <div class="stat-label">Unresolved</div>
+        <div class="stat-val">22%</div>
+        <div class="stat-sub">Escalated to staff</div>
+      </div>
+    </div>
+
+    <!-- TOP QUESTIONS + CATEGORY BREAKDOWN -->
+    <div class="three-col">
+
+      <!-- TOP QUESTIONS -->
+      <div class="card">
+        <div class="card-title"><i class="ti ti-list-numbers"></i>Top Student Questions <span class="card-title-right">this semester</span></div>
+        <div class="question-list">
+          <div class="question-item">
+            <div class="q-rank top">01</div>
+            <div style="flex:1">
+              <div class="q-text">How do I register for exams?</div>
+              <span class="q-tag exams">Exams</span>
+            </div>
+            <div class="q-count">312×</div>
+          </div>
+          <div class="question-item">
+            <div class="q-rank top">02</div>
+            <div style="flex:1">
+              <div class="q-text">Can I move a course from electives to required credits?</div>
+              <span class="q-tag credits">Credits</span>
+            </div>
+            <div class="q-count">248×</div>
+          </div>
+          <div class="question-item">
+            <div class="q-rank top">03</div>
+            <div style="flex:1">
+              <div class="q-text">What happens if I miss the exam registration deadline?</div>
+              <span class="q-tag deadlines">Deadlines</span>
+            </div>
+            <div class="q-count">196×</div>
+          </div>
+          <div class="question-item">
+            <div class="q-rank">04</div>
+            <div style="flex:1">
+              <div class="q-text">How do I transfer credits from another university?</div>
+              <span class="q-tag credits">Credits</span>
+            </div>
+            <div class="q-count">174×</div>
+          </div>
+          <div class="question-item">
+            <div class="q-rank">05</div>
+            <div style="flex:1">
+              <div class="q-text">How do I switch my degree program?</div>
+              <span class="q-tag programs">Programs</span>
+            </div>
+            <div class="q-count">143×</div>
+          </div>
+          <div class="question-item">
+            <div class="q-rank">06</div>
+            <div style="flex:1">
+              <div class="q-text">My exam doesn't appear in TUMonline — what do I do?</div>
+              <span class="q-tag exams">Exams</span>
+            </div>
+            <div class="q-count">117×</div>
+          </div>
+          <div class="question-item">
+            <div class="q-rank">07</div>
+            <div style="flex:1">
+              <div class="q-text">When does re-enrollment open for next semester?</div>
+              <span class="q-tag deadlines">Deadlines</span>
+            </div>
+            <div class="q-count">98×</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATEGORY BREAKDOWN + RESOLUTION -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- CATEGORY BREAKDOWN -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-chart-bar"></i>By Category</div>
+          <div class="bar-list">
+            <div class="bar-item">
+              <div class="bar-label-row">
+                <span class="bar-label">Exam registration</span>
+                <span class="bar-count">429</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill blue" style="width:100%"></div></div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-label-row">
+                <span class="bar-label">Credit transfers</span>
+                <span class="bar-count">322</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill blue" style="width:75%"></div></div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-label-row">
+                <span class="bar-label">Deadlines & dates</span>
+                <span class="bar-count">294</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill orange" style="width:69%"></div></div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-label-row">
+                <span class="bar-label">Program changes</span>
+                <span class="bar-count">143</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill orange" style="width:33%"></div></div>
+            </div>
+            <div class="bar-item">
+              <div class="bar-label-row">
+                <span class="bar-label">Thesis registration</span>
+                <span class="bar-count">96</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill red" style="width:22%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESOLUTION RATE -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-rosette"></i>Resolution Rate</div>
+          <div class="resolution-wrap">
+            <div class="resolution-main">
+              <div class="resolution-circle">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#eaf1f8" stroke-width="8"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#0077cc" stroke-width="8"
+                    stroke-dasharray="201" stroke-dashoffset="44" stroke-linecap="round"/>
+                </svg>
+                <div class="resolution-circle-text">
+                  <div class="resolution-pct">78%</div>
+                  <div class="resolution-sub-label">resolved</div>
+                </div>
+              </div>
+              <div class="resolution-details">
+                <div class="res-row">
+                  <span class="res-label"><span class="res-dot" style="background:#0077cc"></span>Self-resolved</span>
+                  <span class="res-val">1,002</span>
+                </div>
+                <div class="res-row">
+                  <span class="res-label"><span class="res-dot" style="background:#f59e0b"></span>Escalated</span>
+                  <span class="res-val">198</span>
+                </div>
+                <div class="res-row">
+                  <span class="res-label"><span class="res-dot" style="background:#ef4444"></span>Unresolved</span>
+                  <span class="res-val">84</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- QUERY VOLUME HEATMAP -->
+    <div class="card">
+      <div class="card-title"><i class="ti ti-calendar-stats"></i>Query Volume by Week <span class="card-title-right">darker = more queries</span></div>
+      <div class="heatmap-months">
+        <span class="heatmap-month">Oct</span>
+        <span class="heatmap-month">Oct</span>
+        <span class="heatmap-month">Oct</span>
+        <span class="heatmap-month">Oct</span>
+        <span class="heatmap-month">Nov</span>
+        <span class="heatmap-month">Nov</span>
+        <span class="heatmap-month">Nov</span>
+        <span class="heatmap-month">Nov</span>
+        <span class="heatmap-month">Dec</span>
+        <span class="heatmap-month">Dec</span>
+        <span class="heatmap-month">Dec</span>
+        <span class="heatmap-month">Jan</span>
+        <span class="heatmap-month">Jan</span>
+        <span class="heatmap-month">Jan</span>
+        <span class="heatmap-month">Feb</span>
+        <span class="heatmap-month">Feb</span>
+      </div>
+      <div class="heatmap-wrap">
+        <div class="heatmap-row">
+          <span class="heatmap-label">Exam reg.</span>
+          <div class="heatmap-cells">
+            <div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-2"></div>
+            <div class="heatmap-cell heat-3"></div><div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-3"></div>
+            <div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-4"></div>
+            <div class="heatmap-cell heat-5"></div><div class="heatmap-cell heat-5"></div><div class="heatmap-cell heat-4"></div><div class="heatmap-cell heat-2"></div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <span class="heatmap-label">Credits</span>
+          <div class="heatmap-cells">
+            <div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-3"></div><div class="heatmap-cell heat-3"></div><div class="heatmap-cell heat-2"></div>
+            <div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-2"></div>
+            <div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-3"></div>
+            <div class="heatmap-cell heat-4"></div><div class="heatmap-cell heat-3"></div><div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-1"></div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <span class="heatmap-label">Deadlines</span>
+          <div class="heatmap-cells">
+            <div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-2"></div>
+            <div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-2"></div>
+            <div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-0"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-3"></div>
+            <div class="heatmap-cell heat-4"></div><div class="heatmap-cell heat-5"></div><div class="heatmap-cell heat-3"></div><div class="heatmap-cell heat-2"></div>
+          </div>
+        </div>
+        <div class="heatmap-row">
+          <span class="heatmap-label">Programs</span>
+          <div class="heatmap-cells">
+            <div class="heatmap-cell heat-3"></div><div class="heatmap-cell heat-4"></div><div class="heatmap-cell heat-3"></div><div class="heatmap-cell heat-2"></div>
+            <div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div>
+            <div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-0"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-2"></div>
+            <div class="heatmap-cell heat-2"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div><div class="heatmap-cell heat-1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDENT FEEDBACK -->
+    <div class="card">
+      <div class="card-title"><i class="ti ti-thumb-up"></i>Recent Student Feedback <span class="card-title-right">anonymised</span></div>
+      <div class="feedback-list">
+        <div class="feedback-item">
+          <div class="fb-icon">👍</div>
+          <div class="fb-text">"Finally got a straight answer about moving my elective to required — saved me from emailing 3 different offices."</div>
+          <div class="fb-rating"><span class="fb-star">★★★★★</span></div>
+        </div>
+        <div class="feedback-item">
+          <div class="fb-icon">👍</div>
+          <div class="fb-text">"The step-by-step for exam deregistration was exactly what I needed, couldn't find it anywhere on the website."</div>
+          <div class="fb-rating"><span class="fb-star">★★★★★</span></div>
+        </div>
+        <div class="feedback-item">
+          <div class="fb-icon">👎</div>
+          <div class="fb-text">"Couldn't help me with a very specific cross-faculty credit transfer — had to contact the Prüfungsamt anyway."</div>
+          <div class="fb-rating"><span class="fb-star" style="color:#d1d5db">★★★</span><span class="fb-star">★★</span></div>
+        </div>
+        <div class="feedback-item">
+          <div class="fb-icon">👍</div>
+          <div class="fb-text">"As an exchange student, I had no idea about ECTS mapping. This explained everything in 2 minutes."</div>
+          <div class="fb-rating"><span class="fb-star">★★★★★</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
